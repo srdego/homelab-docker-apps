@@ -1,0 +1,21 @@
+networks:
+  caddy-reverse-proxy:
+    external: true
+
+services:
+  caddy:
+    image: ghcr.io/caddybuilds/caddy-cloudflare:2.10-alpine
+    container_name: caddy
+    environment:
+      CLOUDFLARE_API_TOKEN: ${CADDY_CLOUDFLARE_API_TOKEN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./data:/data
+      - ./config:/config
+    ports:
+      - 80:80
+      - 443:443
+      - 443:443/udp
+    networks:
+      - caddy-reverse-proxy
+    restart: unless-stopped
