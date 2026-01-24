@@ -1,0 +1,31 @@
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
+
+log:
+  level: INFO
+
+entryPoints:
+  web:
+    address: :80
+    # redirect HTTP to HTTPS
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+  websecure:
+    address: :443
+
+certificatesResolvers:
+  cloudflare-letsencrypt-acme:
+    acme:
+      storage: /var/traefik/certs/cloudflare-letsencrypt-acme.json
+      caServer: "https://acme-v02.api.letsencrypt.org/directory"
+      dnsChallenge:
+        provider: cloudflare
+
+providers:
+  docker:
+    exposedByDefault: false # explicitly enable Traefik on specific containers
+    network: reverse-proxy # docker network
