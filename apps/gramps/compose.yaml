@@ -1,0 +1,50 @@
+networks:
+  reverse-proxy:
+    external: true
+
+services:
+  grampsweb: &grampsweb
+    image: ghcr.io/gramps-project/grampsweb:25.12.0
+    container_name: grampsweb
+    environment:
+      GRAMPSWEB_TREE: "Gramps Web"
+      GRAMPSWEB_CELERY_CONFIG__broker_url: "redis://redis:6379/0"
+      GRAMPSWEB_CELERY_CONFIG__result_backend: "redis://redis:6379/0"
+      GRAMPSWEB_RATELIMIT_STORAGE_URI: redis://redis:6379/1
+    depends_on:
+      - redis
+    volumes:
+      - /opt/stacks/gramps/users:/app/users
+      - /opt/stacks/gramps/index:/app/indexdir
+      - /opt/stacks/gramps/thumb_cache:/app/thumbnail_cache
+      - /opt/stacks/gramps/cache:/app/cache
+      - /opt/stacks/gramps/secret:/app/secret
+      - /opt/stacks/gramps/db:/root/.gramps/grampsdb
+      - /opt/stacks/gramps/media:/app/media
+      - /opt/stacks/gramps/tmp:/tmp
+    labels:
+      traefik.enable: true
+      traefik.http.routers.grampsweb.rule: Host(`gramps.hl.srdego.com`)
+      traefik.http.routers.grampsweb.entrypoints: websecure
+      traefik.http.routers.grampsweb.tls.certresolver: cloudflare-letsencrypt-acme
+      traefik.http.services.grampsweb.loadbalancer.server.port: "80"
+    networks:
+      - reverse-proxy
+    restart: unless-stopped
+
+  celery:
+    <<: *grampsweb
+    container_name: celery
+    ports: []
+    depends_on:
+      - grampsweb
+      - redis
+    command: celery -A gramps_webapi.celery worker --loglevel=INFO --concurrency=2
+    restart: unless-stopped
+
+  redis:
+    image: docker.io/library/redis:7.2.4-alpine
+    container_name: redis
+    networks:
+      - reverse-proxy
+    restart: unless-stopped
