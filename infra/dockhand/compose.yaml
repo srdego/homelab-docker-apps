@@ -1,0 +1,19 @@
+networks:
+  reverse-proxy:
+    external: true
+
+services:
+  dockhand:
+    image: fnsys/dockhand:latest
+    container_name: dockhand
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./data:/app/data
+    labels:
+      traefik.enable: true
+      traefik.http.routers.dockhand.rule: Host(`dockhand.hl.srdego.com`)
+      traefik.http.routers.dockhand.entrypoints: websecure
+      traefik.http.routers.dockhand.tls.certresolver: cloudflare-letsencrypt-acme
+    networks:
+      - reverse-proxy
+    restart: unless-stopped
