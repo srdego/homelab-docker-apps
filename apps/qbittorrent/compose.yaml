@@ -1,0 +1,38 @@
+networks:
+  reverse-proxy:
+    external: true
+
+services:
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:5.1.4
+    container_name: qbittorrent
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/Madrid
+      WEBUI_PORT: 8080
+      TORRENTING_PORT: 6881
+      DOCKER_MODS: ghcr.io/vuetorrent/vuetorrent-lsio-mod:sha-7fa65a6
+    healthcheck:
+      test: "curl -fsS http://localhost:8080 || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    volumes:
+      - /opt/stacks/qbittorrent/config:/config
+      - /opt/stacks/qbittorrent/downloads:/downloads
+      - /opt/stacks/jellyfin/movies:/movies
+      - /opt/stacks/jellyfin/series:/series
+    ports:
+      - 6881:6881
+      - 6881:6881/udp
+    labels:
+      traefik.enable: true
+      traefik.http.routers.qbittorrent.rule: Host(`qbittorrent.hl.srdego.com`)
+      traefik.http.routers.qbittorrent.entrypoints: websecure
+      traefik.http.routers.qbittorrent.tls.certresolver: cloudflare-letsencrypt-acme
+      traefik.http.services.qbittorrent.loadbalancer.server.port: "8080"
+    networks:
+      - reverse-proxy
+    restart: unless-stopped
