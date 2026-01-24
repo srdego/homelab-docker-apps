@@ -14,6 +14,7 @@ services:
       traefik.http.routers.dockhand.rule: Host(`dockhand.hl.srdego.com`)
       traefik.http.routers.dockhand.entrypoints: websecure
       traefik.http.routers.dockhand.tls.certresolver: cloudflare-letsencrypt-acme
+      traefik.http.services.dockhand.loadbalancer.server.port: "3000"
     networks:
       - reverse-proxy
     restart: unless-stopped
