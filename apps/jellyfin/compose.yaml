@@ -1,0 +1,34 @@
+networks:
+  reverse-proxy:
+    external: true
+
+services:
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:10.11.5
+    container_name: jellyfin
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/Madrid
+    healthcheck:
+      test: "curl -fsS http://localhost:8096 || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    volumes:
+      - /opt/stacks/jellyfin/config:/config
+      - /opt/stacks/jellyfin/cache:/cache
+      - /opt/stacks/jellyfin/movies:/movies
+      - /opt/stacks/jellyfin/series:/series
+    devices:
+      - /dev/dri:/dev/dri
+    labels:
+      traefik.enable: true
+      traefik.http.routers.jellyfin.rule: Host(`jellyfin.hl.srdego.com`)
+      traefik.http.routers.jellyfin.entrypoints: websecure
+      traefik.http.routers.jellyfin.tls.certresolver: cloudflare-letsencrypt-acme
+      traefik.http.services.jellyfin.loadbalancer.server.port: "8096"
+    networks:
+      - reverse-proxy
+    restart: unless-stopped
