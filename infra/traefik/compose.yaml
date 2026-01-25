@@ -6,6 +6,19 @@ services:
   traefik:
     image: docker.io/traefik:v3.6.7
     container_name: traefik
+    command:
+      - "--global.checknewversion=false"
+      - "--global.sendanonymoususage=false"
+      - "--log.level=INFO"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.cloudflare-letsencrypt-acme.acme.storage=/var/traefik/certs/cloudflare-letsencrypt-acme.json"
+      - "--certificatesresolvers.cloudflare-letsencrypt-acme.acme.caserver=https://acme-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.cloudflare-letsencrypt-acme.acme.dnschallenge.provider=cloudflare"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=reverse-proxy"
     environment:
       TZ: ${TZ}
       CF_DNS_API_TOKEN: ${CF_DNS_API_TOKEN}
