@@ -2,6 +2,12 @@ networks:
   reverse-proxy:
     external: true
 
+volumes:
+  traefik-config:
+    external: true
+  traefik-certs:
+    external: true
+
 services:
   traefik:
     image: docker.io/traefik:v3.6.7
@@ -24,10 +30,9 @@ services:
       CF_DNS_API_TOKEN: ${CF_DNS_API_TOKEN}
       CF_API_EMAIL: ${CF_API_EMAIL}
     volumes:
-      - /run/docker.sock:/run/docker.sock:ro
-      - /opt/stacks/traefik/traefik.yaml:/traefik.yaml:ro
-      - /opt/stacks/traefik/config/:/etc/traefik
-      - /opt/stacks/traefik/certs/:/var/traefik/certs
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik-config:/etc/traefik
+      - traefik-certs:/var/traefik/certs
     ports:
       - 80:80
       - 443:443

@@ -2,6 +2,24 @@ networks:
   reverse-proxy:
     external: true
 
+volumes:
+  gramps-users:
+    external: true
+  gramps-index:
+    external: true
+  gramps-thumb-cache:
+    external: true
+  gramps-cache:
+    external: true
+  gramps-secret:
+    external: true
+  gramps-db:
+    external: true
+  gramps-media:
+    external: true
+  gramps-tmp:
+    external: true
+
 services:
   grampsweb: &grampsweb
     image: ghcr.io/gramps-project/grampsweb:25.12.0
@@ -14,14 +32,14 @@ services:
     depends_on:
       - redis
     volumes:
-      - /opt/stacks/gramps/users:/app/users
-      - /opt/stacks/gramps/index:/app/indexdir
-      - /opt/stacks/gramps/thumb_cache:/app/thumbnail_cache
-      - /opt/stacks/gramps/cache:/app/cache
-      - /opt/stacks/gramps/secret:/app/secret
-      - /opt/stacks/gramps/db:/root/.gramps/grampsdb
-      - /opt/stacks/gramps/media:/app/media
-      - /opt/stacks/gramps/tmp:/tmp
+      - gramps-users:/app/users
+      - gramps-index:/app/indexdir
+      - gramps-thumb-cache:/app/thumbnail_cache
+      - gramps-cache:/app/cache
+      - gramps-secret:/app/secret
+      - gramps-db:/root/.gramps/grampsdb
+      - gramps-media:/app/media
+      - gramps-tmp:/tmp
     labels:
       traefik.enable: true
       traefik.http.routers.grampsweb.rule: Host(`gramps.hl.srdego.com`)

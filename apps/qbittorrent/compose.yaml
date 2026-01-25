@@ -2,6 +2,16 @@ networks:
   reverse-proxy:
     external: true
 
+volumes:
+  qbittorrent-config:
+    external: true
+  qbittorrent-downloads:
+    external: true
+  jellyfin-movies:
+    external: true
+  jellyfin-series:
+    external: true
+
 services:
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:5.1.4
@@ -20,10 +30,10 @@ services:
       retries: 3
       start_period: 10s
     volumes:
-      - /opt/stacks/qbittorrent/config:/config
-      - /opt/stacks/qbittorrent/downloads:/downloads
-      - /opt/stacks/jellyfin/movies:/movies
-      - /opt/stacks/jellyfin/series:/series
+      - qbittorrent-config:/config
+      - qbittorrent-downloads:/downloads
+      - jellyfin-movies:/movies
+      - jellyfin-series:/series
     ports:
       - 6881:6881
       - 6881:6881/udp

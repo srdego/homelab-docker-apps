@@ -2,13 +2,17 @@ networks:
   reverse-proxy:
     external: true
 
+volumes:
+  dockhand-data:
+    external: true
+
 services:
   dockhand:
     image: fnsys/dockhand:latest
     container_name: dockhand
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /opt/stacks/dockhand/data:/app/data
+      - dockhand-data:/app/data
     labels:
       traefik.enable: true
       traefik.http.routers.dockhand.rule: Host(`dockhand.hl.srdego.com`)

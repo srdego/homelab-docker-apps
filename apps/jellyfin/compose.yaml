@@ -2,6 +2,16 @@ networks:
   reverse-proxy:
     external: true
 
+volumes:
+  jellyfin-config:
+    external: true
+  jellyfin-cache:
+    external: true
+  jellyfin-movies:
+    external: true
+  jellyfin-series:
+    external: true
+
 services:
   jellyfin:
     image: lscr.io/linuxserver/jellyfin:10.11.5
@@ -17,10 +27,10 @@ services:
       retries: 3
       start_period: 10s
     volumes:
-      - /opt/stacks/jellyfin/config:/config
-      - /opt/stacks/jellyfin/cache:/cache
-      - /opt/stacks/jellyfin/movies:/movies
-      - /opt/stacks/jellyfin/series:/series
+      - jellyfin-config:/config
+      - jellyfin-cache:/cache
+      - jellyfin-movies:/movies
+      - jellyfin-series:/series
     devices:
       - /dev/dri:/dev/dri
     labels:

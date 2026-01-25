@@ -2,6 +2,16 @@ networks:
   reverse-proxy:
     external: true
 
+volumes:
+  mathesar-pgdata:
+    external: true
+  mathesar-media:
+    external: true
+  mathesar-static:
+    external: true
+  mathesar-secrets:
+    external: true
+
 services:
   postgres:
     image: docker.io/pgautoupgrade/pgautoupgrade:17-alpine
@@ -17,7 +27,7 @@ services:
       retries: 3
       start_period: 15s
     volumes:
-      - /opt/stacks/mathesar/pgdata:/var/lib/postgresql/data
+      - mathesar-pgdata:/var/lib/postgresql/data
     networks:
       - reverse-proxy
     restart: unless-stopped
@@ -45,9 +55,9 @@ services:
       retries: 3
       start_period: 10s
     volumes:
-      - /opt/stacks/mathesar/media:/code/media
-      - /opt/stacks/mathesar/static:/code/static
-      - /opt/stacks/mathesar/secrets:/code/.secrets
+      - mathesar-media:/code/media
+      - mathesar-static:/code/static
+      - mathesar-secrets:/code/.secrets
     labels:
       traefik.enable: true
       traefik.http.routers.mathesar.rule: Host(`mathesar.hl.srdego.com`)
